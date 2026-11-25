@@ -1,0 +1,327 @@
+# yaml-language-server: $schema=./quartz/plugins/quartz-plugins.schema.json
+#
+# Quartz 5 settings shared by the Callout Studio docs sites. assemble.mjs writes
+# each site's quartz.config.yaml from this file and the `quartz` part of that
+# site's site.json: its name and address, and any plugin options of its own.
+# This is Quartz's default configuration with these changes:
+# - the site's name and address come from site.json; colors (Callout Studio's
+#   purple) and fonts (Inter and JetBrains Mono, served from the site itself,
+#   so no visitor contacts Google) are the same for both;
+# - the site's own look and components, in theme/ (see theme/site.ts): the
+#   chapter list replaces Quartz's Explorer, the site's own footer Quartz's, and
+#   the page header (chapter, title, reading time, date) its breadcrumbs, title
+#   and date line;
+# - no analytics;
+# - Markdown is read the way GitHub reads it, since the docs are written for
+#   GitHub: a single line break is a space, quotes stay straight, and
+#   Obsidian-only syntax (tags, highlights, %% comments, wikilinks, math) stays
+#   plain text;
+# - each page's date is when it last changed in Callout-Studio/obsidian, which
+#   prepare-content.mjs writes into the page;
+# - no backlinks, RSS feed or CNAME file;
+# - the graph's libraries come from the site itself (prepare-graph.mjs), not from
+#   a CDN, so no visitor contacts a third party.
+configuration:
+  # pageTitle, pageTitleSuffix and baseUrl are each site's own: site.json →
+  # quartz.configuration. assemble.mjs stops if one is missing.
+  pageTitle:
+  pageTitleSuffix:
+  enableSPA: true
+  enablePopovers: true
+  prefetch: viewport
+  analytics: null
+  locale: en-US
+  baseUrl:
+  ignorePatterns:
+    - private
+    - templates
+    - .obsidian
+  theme:
+    cdnCaching: false
+    # Inter is the font of Obsidian's own interface. The files are the site's
+    # own (theme/static/fonts, declared in theme/custom.scss); the weights here
+    # are what the share images (og-image) download when the site is built.
+    typography:
+      header:
+        name: Inter
+        weights: [600, 700]
+      body:
+        name: Inter
+        weights: [400, 600]
+      code:
+        name: JetBrains Mono
+        weights: [400]
+    # Every text color passes WCAG AA (4.5:1) on its background, in both modes:
+    # body text 10.9 / 12.2, muted text 5.1 / 6.1, links 5.6 / 7.4.
+    colors:
+      lightMode:
+        light: "#fcfbfe"
+        lightgray: "#e6e2ef"
+        gray: "#6e6a7c"
+        darkgray: "#3b3a44"
+        dark: "#1e1c26"
+        secondary: "#7750b8"
+        tertiary: "#5d379f"
+        highlight: rgba(119, 80, 184, 0.10)
+        textHighlight: "#f6df7a99"
+      darkMode:
+        light: "#1c1c1c"
+        lightgray: "#303030"
+        gray: "#9a9a9a"
+        darkgray: "#dadada"
+        dark: "#f0f0f0"
+        secondary: "#b49cff"
+        tertiary: "#cfc0ff"
+        highlight: rgba(179, 146, 255, 0.14)
+        textHighlight: "#8a7a1a99"
+  fonts:
+    fontOrigin: local
+  links:
+    markdownLinkResolution: relative
+  contentIndex:
+    enableSiteMap: true
+    enableRSS: false
+plugins:
+  - source: "@quartz-community/created-modified-date"
+    enabled: true
+    options:
+      defaultDateType: modified
+      priority:
+        - frontmatter
+        - filesystem
+    order: 10
+  - source: "@quartz-community/syntax-highlighting"
+    enabled: true
+    options:
+      theme:
+        light: github-light
+        dark: github-dark
+      keepBackground: false
+    order: 20
+  - source: "@quartz-community/github-flavored-markdown"
+    enabled: true
+    options:
+      enableSmartyPants: false
+    order: 30
+  - source: "@quartz-community/obsidian-flavored-markdown"
+    enabled: true
+    options:
+      preset: strict
+      comments: false
+      highlight: false
+      wikilinks: false
+      parseTags: false
+      parseBlockReferences: false
+      enableInHtmlEmbed: false
+      enableYouTubeEmbed: false
+      enableTweetEmbed: false
+      enableCheckbox: false
+    order: 40
+  # Only its reading of the headings is used: the list itself is drawn by
+  # theme/components/TableOfContents.tsx (theme/site.ts places it), which cannot be
+  # folded and marks the section being read.
+  - source: "@quartz-community/table-of-contents"
+    enabled: true
+    order: 50
+  - source: "@quartz-community/description"
+    enabled: true
+    order: 70
+  - source: "@quartz-community/latex"
+    enabled: false
+    options:
+      renderEngine: katex
+    order: 80
+  - source: "@quartz-community/citations"
+    enabled: false
+    order: 85
+  - source: "@quartz-community/ox-hugo"
+    enabled: false
+    order: 91
+  - source: "@quartz-community/roam"
+    enabled: false
+    order: 92
+  - source: "@quartz-themes/core"
+    enabled: false
+    options:
+      theme: Tokyo Night
+      mode: both
+  - source: "@quartz-community/explicit-publish"
+    enabled: false
+  - source: "@quartz-community/alias-redirects"
+    enabled: true
+  - source: "@quartz-community/favicon"
+    enabled: true
+  - source: "@quartz-community/og-image"
+    enabled: true
+  - source: "@quartz-community/cname"
+    enabled: false
+  - source: "@quartz-community/canvas-page"
+    enabled: true
+  - source: "@quartz-community/content-page"
+    enabled: true
+  - source: "@quartz-community/folder-page"
+    enabled: true
+  # Off: no page of the docs has tags, so its index would be an empty list.
+  - source: "@quartz-community/tag-page"
+    enabled: false
+  # Replaced by the chapter list in theme/components/ChapterNav.tsx, which
+  # groups the chapters the way the guide's README does.
+  - source: "@quartz-community/explorer"
+    enabled: false
+    layout:
+      position: left
+      priority: 50
+  # In the right-hand column, right after the table of contents (theme/site.ts
+  # orders the column). Its two libraries are served from the site, not from a
+  # CDN: see prepare-graph.mjs.
+  - source: "@quartz-community/graph"
+    enabled: true
+    # A site can set its own options (site.json → quartz.plugins).
+    layout:
+      position: right
+      priority: 40
+  - source: "@quartz-community/search"
+    enabled: true
+    layout:
+      position: left
+      priority: 20
+      group: toolbar
+      groupOptions:
+        grow: true
+  - source: "@quartz-community/backlinks"
+    enabled: false
+    layout:
+      position: right
+      priority: 50
+  # Off: theme/components/PageHeader.tsx draws the top of every page but the
+  # home page, which has its own heading, in theme/components/HomeHero.tsx.
+  - source: "@quartz-community/article-title"
+    enabled: false
+    layout:
+      position: beforeBody
+      priority: 10
+      condition: not-index
+  # Off: replaced by theme/components/PageHeader.tsx (as the breadcrumbs below).
+  - source: "@quartz-community/content-meta"
+    enabled: false
+    layout:
+      position: beforeBody
+      priority: 20
+      condition: not-index
+  - source: "@quartz-community/tag-list"
+    enabled: false
+    layout:
+      position: beforeBody
+      priority: 30
+  - source: "@quartz-community/page-title"
+    enabled: true
+    layout:
+      position: left
+      priority: 10
+  # In the footer slot: theme/site.ts hands it to theme/components/SiteFooter.tsx,
+  # which draws its own button and keeps Quartz's script for the switch.
+  - source: "@quartz-community/darkmode"
+    enabled: true
+    layout:
+      position: footer
+      priority: 40
+  # Off: it hid the chapter list and the table of contents.
+  - source: "@quartz-community/reader-mode"
+    enabled: false
+    layout:
+      position: left
+      priority: 35
+      group: toolbar
+  # Off: every chapter is at the same level, so the breadcrumbs only said "Home"
+  # and then repeated the title. PageHeader says which chapter this is.
+  - source: "@quartz-community/breadcrumbs"
+    enabled: false
+    layout:
+      position: beforeBody
+      priority: 5
+      condition: not-index
+  - source: "@quartz-community/comments"
+    enabled: false
+    options:
+      provider: giscus
+      options: {}
+    layout:
+      position: afterBody
+      priority: 10
+  # Replaced by theme/components/SiteFooter.tsx (its links are in each site's quartz.ts).
+  - source: "@quartz-community/footer"
+    enabled: false
+    layout:
+      position: footer
+      priority: 50
+  - source: "@quartz-community/recent-notes"
+    enabled: false
+  - source: "@quartz-community/spacer"
+    enabled: true
+    options: {}
+    order: 25
+    layout:
+      position: left
+      priority: 25
+      display: mobile-only
+  - source: "@quartz-community/bases-page"
+    enabled: true
+    options: {}
+    order: 50
+  - source: "@quartz-community/note-properties"
+    enabled: true
+    options:
+      includeAll: false
+      includedProperties:
+        - description
+        - tags
+      excludedProperties: []
+      hidePropertiesView: false
+    order: 5
+    layout:
+      position: beforeBody
+      priority: 15
+      display: all
+  - source: "@quartz-community/unlisted-pages"
+    enabled: true
+    options: {}
+    order: 45
+  - source: "@quartz-community/encrypted-pages"
+    enabled: true
+    options:
+      iterations: 600000
+      passwordField: password
+      unlistWhenEncrypted: false
+      outputPath: static/encryptedContentIndex.json
+    order: 900
+  - source: "@quartz-community/stacked-pages"
+    enabled: false
+    layout:
+      position: afterBody
+      priority: 50
+      display: all
+layout:
+  # The chapter list is taller than a screen: the left sidebar scrolls on its
+  # own, and the table of contents stays in view.
+  sidebars:
+    left: scroll
+    right: fit
+  groups:
+    toolbar:
+      priority: 35
+      direction: row
+      gap: 0.5rem
+  byPageType:
+    "404":
+      positions:
+        beforeBody: []
+        left: []
+        right: []
+    content: {}
+    folder:
+      exclude:
+        - reader-mode
+      positions:
+        right: []
+    canvas: {}
+    bases: {}

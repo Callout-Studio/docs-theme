@@ -1,0 +1,1953 @@
+@use "./variables.scss" as *;
+
+// Callout Studio's look for its docs sites. assemble.mjs copies this file
+// over Quartz's quartz/styles/custom.scss, which Quartz loads after its
+// own styles and outside their cascade layers, so these rules win.
+//
+// Colors come from quartz.config.yaml (--light, --dark, --secondary, …). The
+// few extra colors below are defined for both modes; Quartz marks dark mode
+// with :root[saved-theme="dark"].
+
+// ---------------------------------------------------------------- fonts
+
+// Inter (one variable file for every weight) and JetBrains Mono, served from
+// the site as WOFF2 and split by alphabet: a browser downloads only the parts
+// a page uses, so a page in English loads about 70 KB of fonts and no request
+// goes to Google. Both are under the SIL Open Font License; the licenses are
+// next to the files. quartz.config.yaml sets fonts.fontOrigin to local, so
+// Quartz itself loads no fonts.
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("static/fonts/inter-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("static/fonts/inter-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("static/fonts/inter-cyrillic.woff2") format("woff2");
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("static/fonts/jetbrains-mono-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("static/fonts/jetbrains-mono-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("static/fonts/jetbrains-mono-cyrillic.woff2") format("woff2");
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+// ---------------------------------------------------------------- tokens
+
+:root {
+  --cs-radius: 10px;
+  --cs-radius-small: 6px;
+  --cs-reading: 40rem;
+  --cs-ease: cubic-bezier(0.2, 0, 0, 1);
+  --cs-shadow: 0 1px 2px rgb(30 28 38 / 0.06), 0 4px 16px rgb(30 28 38 / 0.06);
+  --cs-shadow-hover: 0 2px 4px rgb(30 28 38 / 0.08), 0 10px 28px rgb(30 28 38 / 0.1);
+  --cs-button-text: #ffffff;
+  --cs-surface: #ffffff;
+  --cs-logo: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJDYWxsb3V0IFN0dWRpbyI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9InRpbGUiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBzdG9wLWNvbG9yPSIjMmQyMDQ5Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMTUxMDFmIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3QgeD0iMC41IiB5PSIwLjUiIHdpZHRoPSI2MyIgaGVpZ2h0PSI2MyIgcng9IjE3IiBmaWxsPSJ1cmwoI3RpbGUpIiBzdHJva2U9IiNiMzkyZmYiIHN0cm9rZS1vcGFjaXR5PSIwLjM1Ii8+CiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTQgMTQpIHNjYWxlKDEuNSkiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2IzOTJmZiIgc3Ryb2tlLXdpZHRoPSIxLjc1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPgogICAgPHBhdGggZD0ibTE0LjYyMiAxNy44OTctMTAuNjgtMi45MTMiLz4KICAgIDxwYXRoIGQ9Ik0xOC4zNzYgMi42MjJhMSAxIDAgMSAxIDMuMDAyIDMuMDAyTDE3LjM2IDkuNjQzYS41LjUgMCAwIDAgMCAuNzA3bC45NDQuOTQ0YTIuNDEgMi40MSAwIDAgMSAwIDMuNDA4bC0uOTQ0Ljk0NGEuNS41IDAgMCAxLS43MDcgMEw4LjM1NCA3LjM0OGEuNS41IDAgMCAxIDAtLjcwN2wuOTQ0LS45NDRhMi40MSAyLjQxIDAgMCAxIDMuNDA4IDBsLjk0NC45NDRhLjUuNSAwIDAgMCAuNzA3IDB6Ii8+CiAgICA8cGF0aCBkPSJNOSA4Yy0xLjgwNCAyLjcxLTMuOTcgMy40Ni02LjU4MyAzLjk0OGEuNTA3LjUwNyAwIDAgMC0uMzAyLjgxOWw3LjMyIDguODgzYTEgMSAwIDAgMCAxLjE4NS4yMDRDMTIuNzM1IDIwLjQwNSAxNiAxNi43OTIgMTYgMTUiLz4KICA8L2c+Cjwvc3ZnPgo=");
+
+  // Obsidian's callout colors (its app.css), as "r, g, b". The -text
+  // shades are the same hue made dark enough for 4.5:1 on the callout's
+  // fill; Obsidian's own light-mode cyan, orange and green titles fall short.
+  --cs-red: 233, 49, 71;
+  --cs-red-text: #c4293c;
+  --cs-orange: 236, 117, 0;
+  --cs-orange-text: #aa5400;
+  --cs-yellow: 224, 172, 0;
+  --cs-yellow-text: #866700;
+  --cs-green: 8, 185, 78;
+  --cs-green-text: #057a33;
+  --cs-cyan: 0, 191, 188;
+  --cs-cyan-text: #007a78;
+  --cs-blue: 8, 109, 221;
+  --cs-blue-text: #0866d0;
+  --cs-purple: 120, 82, 238;
+  --cs-purple-text: #714de0;
+  --cs-pink: 213, 57, 132;
+  --cs-pink-text: #bb3274;
+  --cs-gray: 158, 158, 158;
+  --cs-gray-text: #6b6b6b;
+}
+
+:root[saved-theme="dark"] {
+  --cs-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 4px 16px rgb(0 0 0 / 0.25);
+  --cs-shadow-hover: 0 2px 4px rgb(0 0 0 / 0.35), 0 10px 28px rgb(0 0 0 / 0.35);
+  --cs-button-text: #1c1c1c;
+  --cs-surface: #232323;
+
+  --cs-red: 251, 70, 76;
+  --cs-red-text: #fb6a6f;
+  --cs-orange: 233, 151, 63;
+  --cs-orange-text: #e9973f;
+  --cs-yellow: 224, 222, 113;
+  --cs-yellow-text: #e0de71;
+  --cs-green: 68, 207, 110;
+  --cs-green-text: #44cf6e;
+  --cs-cyan: 83, 223, 221;
+  --cs-cyan-text: #53dfdd;
+  --cs-blue: 2, 122, 255;
+  --cs-blue-text: #4d9bff;
+  --cs-purple: 168, 130, 255;
+  --cs-purple-text: #a882ff;
+  --cs-pink: 250, 153, 205;
+  --cs-pink-text: #fa99cd;
+  --cs-gray: 158, 158, 158;
+  --cs-gray-text: #b0b0b0;
+}
+
+// ---------------------------------------------------------------- focus
+
+:where(a, button, summary, input, [tabindex]):focus-visible {
+  outline: 2px solid var(--secondary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+// ---------------------------------------------------------------- reading column
+
+body {
+  font-size: 1.0625rem;
+}
+
+// Text cannot be selected, except code, which the pages ask you to copy, and
+// what you type into the search box.
+body {
+  -webkit-user-select: none;
+  user-select: none;
+}
+pre,
+code,
+input,
+textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.page > #quartz-body {
+  & .center {
+    @media all and not ($mobile) {
+      max-width: var(--cs-reading);
+      min-width: 0;
+      width: 100%;
+    }
+  }
+  // Above phone width the column sits in the middle of the space beside the
+  // sidebar(s). Quartz gives it margin-right: 0 on a tablet, which would press
+  // it against the right edge once the right column has moved below it.
+  @media all and not ($mobile) {
+    & .center {
+      margin-inline: auto;
+    }
+  }
+  // Once the right column is gone, the page's 1rem edge is all that is left
+  // beside the text, and a scrollbar that floats over the page (macOS) takes
+  // most of it. Give the right side room, on a tablet and on a phone.
+  @media all and not ($desktop) {
+    padding-right: clamp(1.5rem, 5vw, 3.5rem);
+  }
+}
+
+article {
+  line-height: 1.7;
+
+  & > .markdown-preview-view > * + h2 {
+    margin-top: 3rem;
+  }
+  & h2,
+  & h3,
+  & h4 {
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+  & h2 {
+    font-size: 1.5rem;
+    padding-top: 0.25rem;
+  }
+  & h3 {
+    font-size: 1.2rem;
+    margin-top: 2rem;
+  }
+  & p,
+  & li {
+    text-wrap: pretty;
+  }
+  & img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 1.5rem auto;
+    border-radius: var(--cs-radius);
+  }
+}
+
+.page article > h1,
+.article-title {
+  font-size: clamp(1.9rem, 4vw, 2.4rem);
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+  margin: 0;
+}
+
+// ---------------------------------------------------------------- page header
+
+// Drawn by theme/components/PageHeader.tsx: the title, two chips (reading time,
+// and when the page last changed in the plugin's repository), and, below the
+// width where the table of contents has its column, the page's sections in a
+// folded list. A page with a band (one that has a picture of its own in the
+// site's theme/banners/) has the title and the chips on it, with that picture
+// at its right.
+.cs-page-head {
+  padding-top: 0.75rem;
+  & > .article-title {
+    margin-top: 0.75rem;
+  }
+}
+
+// The band is Obsidian's purple on every page: --band is the purple of the
+// site's callouts, so the band and its picture follow the light and dark themes.
+.cs-band {
+  --band: var(--cs-purple);
+  --band-top: #f2ebfd;
+  --band-bottom: #fbf9ff;
+  --band-glow: rgba(var(--band), 0.2);
+  // The surface of the windows and menus in the pictures.
+  --band-pane: #ffffff;
+  position: relative;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  min-height: 9.75rem;
+  padding: 1.5rem 1.75rem;
+  border: 1px solid rgba(var(--band), 0.3);
+  border-radius: 14px;
+  overflow: hidden;
+  background:
+    radial-gradient(70% 130% at 85% 50%, var(--band-glow), transparent 70%),
+    linear-gradient(135deg, var(--band-top), var(--band-bottom));
+  // The picture's size follows the band's width (below), not the screen's: the
+  // column is narrower than the screen's width suggests on a tablet.
+  container: cs-band / inline-size;
+  :root[saved-theme="dark"] & {
+    --band-top: #2a2040;
+    --band-bottom: #1d1630;
+    --band-glow: rgba(var(--band), 0.28);
+    --band-pane: #181220;
+  }
+  @media all and ($mobile) {
+    padding: 1.25rem 1.1rem;
+  }
+}
+
+.cs-band-text {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.45rem;
+  // Two lines at most for the longest title, and room for the picture.
+  max-width: min(100%, 22rem);
+  & .article-title {
+    font-size: clamp(1.55rem, 3.2vw, 2rem);
+    line-height: 1.12;
+  }
+  & .cs-band-eyebrow {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    // A little weaker than the title's white.
+    color: color-mix(in srgb, var(--dark) 65%, transparent);
+  }
+}
+
+// A page's picture (theme/banners/<page>.svg, inlined by PageHeader.tsx), at
+// the band's right. The pictures are drawn without colours of their own: they
+// use the classes below, all of them tints of --band, so each picture is
+// plain shapes and one stylesheet gives them the same look, in both themes.
+// A picture has no gradients or ids, which two pictures side by side in a hover
+// preview could confuse.
+.cs-band-picture {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  aspect-ratio: 280 / 160;
+  color: rgb(var(--band));
+  pointer-events: none;
+  // When the band is too narrow for the picture beside the text (a phone, a
+  // narrow column), it is behind the text instead, and faint.
+  @container cs-band (max-width: 34rem) {
+    opacity: 0.28;
+    translate: 2rem 0;
+  }
+  & svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  // A window, a menu, a panel: opaque, so what is behind it does not show.
+  & .pane {
+    fill: color-mix(in srgb, rgb(var(--band)) 7%, var(--band-pane));
+    stroke: rgba(var(--band), 0.55);
+    stroke-width: 1;
+  }
+  // A callout card; the selected thing in a list.
+  & .tint {
+    fill: rgba(var(--band), 0.16);
+    stroke: rgba(var(--band), 0.5);
+    stroke-width: 1;
+  }
+  & .hit {
+    fill: rgba(var(--band), 0.24);
+    stroke: rgba(var(--band), 0.7);
+    stroke-width: 1;
+  }
+  & .soft {
+    fill: rgba(var(--band), 0.1);
+  }
+  & .solid {
+    fill: rgb(var(--band));
+  }
+  // Titles, then lines of text.
+  & .bar {
+    fill: rgba(var(--band), 0.85);
+  }
+  & .line {
+    fill: rgba(var(--band), 0.38);
+  }
+  // Lucide icons.
+  & .glyph {
+    fill: none;
+    stroke: rgb(var(--band));
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    &.bold {
+      stroke-width: 2.6;
+    }
+    &.dim {
+      stroke: rgba(var(--band), 0.6);
+    }
+  }
+  // Strokes drawn by hand.
+  & .ink {
+    fill: none;
+    stroke: rgb(var(--band));
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    &.dim {
+      stroke: rgba(var(--band), 0.45);
+    }
+  }
+  & .cursor {
+    fill: rgb(var(--band));
+    stroke: var(--band-pane);
+    stroke-width: 1.6;
+    stroke-linejoin: round;
+  }
+  & .lens {
+    fill: var(--band-pane);
+    stroke: rgb(var(--band));
+    stroke-width: 2.6;
+  }
+}
+
+.cs-page-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.9rem 0 0;
+}
+
+.cs-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0.7rem;
+  border: 1px solid var(--lightgray);
+  border-radius: 999px;
+  background: var(--cs-surface);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--gray);
+  & time {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  & svg {
+    flex: none;
+    width: 0.9rem;
+    height: 0.9rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
+
+a.cs-chip {
+  transition:
+    color 0.15s var(--cs-ease),
+    border-color 0.15s var(--cs-ease);
+  &:hover {
+    color: var(--secondary);
+    border-color: currentColor;
+  }
+}
+
+.cs-onpage {
+  display: none;
+  margin-top: 1rem;
+  border: 1px solid var(--lightgray);
+  border-radius: var(--cs-radius);
+  background: var(--cs-surface);
+  // Where the table of contents has no column of its own.
+  @media all and not ($desktop) {
+    display: block;
+  }
+  // The hover preview of a page is its header and its text; the list is not
+  // part of what it previews.
+  .popover & {
+    display: none;
+  }
+  & > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0 0.9rem;
+    border-radius: var(--cs-radius);
+    cursor: pointer;
+    list-style: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--darkgray);
+    &::-webkit-details-marker {
+      display: none;
+    }
+    &::after {
+      content: "";
+      flex: none;
+      width: 1em;
+      height: 1em;
+      background-color: currentColor;
+      mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>')
+        no-repeat center / contain;
+      transition: rotate 0.15s var(--cs-ease);
+    }
+  }
+  &[open] > summary::after {
+    rotate: 180deg;
+  }
+  & ul {
+    list-style: none;
+    margin: 0;
+    padding: 0 0.5rem 0.5rem;
+  }
+  & li {
+    margin: 0;
+    @for $depth from 1 through 5 {
+      &.depth-#{$depth} {
+        padding-left: #{$depth}rem;
+      }
+    }
+  }
+  & li a {
+    display: block;
+    padding: 0.4rem 0.5rem;
+    border-radius: var(--cs-radius-small);
+    font-size: 0.9rem;
+    font-weight: 400;
+    line-height: 1.35;
+    color: var(--darkgray);
+    &:hover {
+      background: var(--highlight);
+      color: var(--secondary);
+    }
+  }
+}
+
+// ---------------------------------------------------------------- site title
+
+.page-title {
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
+  margin: 0;
+  & a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--dark);
+    &::before {
+      content: "";
+      flex: none;
+      width: 1.9rem;
+      height: 1.9rem;
+      background: var(--cs-logo) center / contain no-repeat;
+    }
+  }
+}
+
+// ---------------------------------------------------------------- toolbar
+
+.search > .search-button {
+  height: 2.5rem;
+  border-radius: var(--cs-radius-small);
+  border: 1px solid var(--lightgray);
+  background: var(--cs-surface);
+  color: var(--gray);
+  transition: border-color 0.15s var(--cs-ease);
+  & > p {
+    color: var(--gray);
+  }
+  &:hover {
+    border-color: color-mix(in srgb, var(--secondary) 45%, var(--lightgray));
+  }
+  // The keyboard shortcut, written the way this computer writes it.
+  &::after {
+    content: "Ctrl K";
+    margin-left: auto;
+    padding: 0.05rem 0.4rem;
+    border: 1px solid var(--lightgray);
+    border-radius: 4px;
+    font: 0.75rem/1.4 var(--codeFont);
+    color: var(--gray);
+    white-space: nowrap;
+  }
+  :root[data-cs-platform="apple"] &::after {
+    content: "⌘K";
+  }
+  @media (hover: none) {
+    &::after {
+      display: none;
+    }
+  }
+}
+
+// Above phone width the search box has the row under the site's name to itself.
+@media all and not ($mobile) {
+  .page > #quartz-body .sidebar.left {
+    // The search row is the search box alone, across the sidebar (Quartz
+    // caps the box at 224px for the row it used to share).
+    & > .flex-component {
+      width: 100%;
+      & .search {
+        max-width: none;
+        width: 100%;
+      }
+    }
+  }
+}
+
+// ---------------------------------------------------------------- chapter list
+
+.cs-chapters {
+  display: contents;
+}
+
+.cs-nav {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.95rem;
+
+  & ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  // The groups: room above and below each one and a rule between one and the
+  // next, so where a category ends and the next begins is plain at a glance.
+  & .cs-nav-group {
+    padding-block: 1rem;
+    &:first-child {
+      padding-top: 0;
+    }
+    &:last-child {
+      padding-bottom: 0;
+    }
+    & + .cs-nav-group {
+      border-top: 1px solid var(--lightgray);
+    }
+
+    // Opening and closing slide instead of jumping. The content of a <details>
+    // is its ::details-content box; a one-row grid whose row goes between 1fr and
+    // 0fr animates the height in every browser that has that box (the newer
+    // interpolate-size works only in Chromium). The box is hidden by the
+    // browser with content-visibility, which Safari does not hold back until a
+    // closing has finished (it jumps shut), so it is kept drawn here and the
+    // closed list is hidden with visibility instead, after the slide (below).
+    // A browser without the box just shows and hides it, as before.
+    &::details-content {
+      content-visibility: visible;
+      display: grid;
+      grid-template-rows: 1fr;
+    }
+    &:not([open])::details-content {
+      grid-template-rows: 0fr;
+    }
+    & > ul {
+      // The row's only item: it may shrink to nothing and clips what is left.
+      min-height: 0;
+      overflow: hidden;
+      // The clip would cut a link's focus ring (2px + 2px offset), so the list
+      // keeps 4px of its own on every side and the negative margin takes it back.
+      margin: -4px;
+      padding: 4px;
+    }
+    // Closed: faded out and, once the slide is over, out of the tab order and
+    // away from screen readers (visibility, which a drawn-but-clipped list needs).
+    &:not([open]) > ul {
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+
+  // Only once the page has settled: the script closes the groups you had folded
+  // while the page loads (data-settling, see ChapterNav), and that must not play.
+  @media (prefers-reduced-motion: no-preference) {
+    &:not([data-settling]) .cs-nav-group {
+      &::details-content {
+        transition: grid-template-rows 0.3s var(--cs-ease);
+      }
+      & > ul {
+        transition:
+          opacity 0.25s var(--cs-ease),
+          visibility 0s;
+      }
+      &:not([open]) > ul {
+        transition:
+          opacity 0.25s var(--cs-ease),
+          visibility 0s linear 0.3s;
+      }
+      & > summary::after {
+        transition:
+          rotate 0.3s var(--cs-ease),
+          opacity 0.15s var(--cs-ease);
+      }
+    }
+  }
+  & a {
+    display: flex;
+    gap: 0.6rem;
+    align-items: baseline;
+    padding: 0.3rem 0.6rem;
+    border-radius: var(--cs-radius-small);
+    color: var(--darkgray);
+    font-weight: 400;
+    line-height: 1.35;
+    transition:
+      background-color 0.15s var(--cs-ease),
+      color 0.15s var(--cs-ease);
+    &:hover {
+      background-color: var(--highlight);
+      color: var(--dark);
+    }
+    &[aria-current="page"] {
+      background-color: var(--highlight);
+      color: var(--secondary);
+      font-weight: 600;
+      & .cs-nav-number {
+        color: var(--secondary);
+      }
+    }
+  }
+  & .cs-nav-number {
+    flex: none;
+    min-width: 1.4rem;
+    font: 0.75rem/1 var(--codeFont);
+    color: var(--gray);
+    font-variant-numeric: tabular-nums;
+  }
+
+  // The group's title starts at the same edge as the chapter numbers under it.
+  // The fold marker follows the title and shows only while the pointer is over
+  // the row (or the keyboard is on it): pointing right when the group is closed,
+  // down when it is open. It keeps its place when hidden, so the title never
+  // moves. Where there is no hover (a touch screen) it is always shown.
+  & summary {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.6rem 0.45rem;
+    border-radius: var(--cs-radius-small);
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    // Darker than the chapter links' grey numbers, so a heading reads as a heading.
+    color: var(--dark);
+    &::-webkit-details-marker {
+      display: none;
+    }
+    &::after {
+      content: "";
+      flex: none;
+      width: 0.9em;
+      height: 0.9em;
+      background-color: currentColor;
+      mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>')
+        no-repeat center / contain;
+      rotate: -90deg;
+      opacity: 0;
+    }
+    &:hover,
+    &:focus-visible {
+      &::after {
+        opacity: 1;
+      }
+    }
+    &:hover {
+      color: var(--secondary);
+    }
+    @media (hover: none) {
+      &::after {
+        opacity: 1;
+      }
+    }
+  }
+  & details[open] > summary::after {
+    rotate: 0deg;
+  }
+}
+
+// Above phone width the list sits in the sidebar; on a phone it is in the drawer.
+.cs-nav-sidebar {
+  @media all and ($mobile) {
+    display: none;
+  }
+  // Leave room under the list so its end can scroll clear of the screen edge.
+  padding-bottom: 2rem;
+}
+
+.cs-menu-button {
+  display: none;
+  @media all and ($mobile) {
+    display: inline-grid;
+    place-items: center;
+    order: -1;
+    flex: none;
+    width: 44px;
+    height: 44px;
+    margin-right: 0.25rem;
+    padding: 0;
+    border: 0;
+    border-radius: var(--cs-radius-small);
+    background: transparent;
+    color: var(--dark);
+    cursor: pointer;
+  }
+  & svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+}
+
+// The drawer: a full-screen <dialog> with a sideways scroller. The sheet is
+// the first snap point (open), an empty column the second (closed).
+.cs-drawer {
+  --cs-drawer-width: min(20rem, 85dvw, 100dvw - 24px);
+  --cs-drawer-backdrop: 0;
+  inset: 0;
+  width: auto;
+  height: auto;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: visible;
+  color: var(--darkgray);
+
+  &::backdrop {
+    background: #000;
+    opacity: calc(var(--cs-drawer-backdrop) / 2);
+  }
+}
+
+.cs-drawer-scroller {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--cs-drawer-width) 100%;
+  overflow-x: scroll;
+  overscroll-behavior: none;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+  @media (prefers-reduced-motion: no-preference) {
+    scroll-behavior: smooth;
+  }
+  &::after {
+    content: "";
+    scroll-snap-align: end;
+    scroll-initial-target: nearest;
+  }
+}
+
+.cs-drawer-sheet {
+  display: flex;
+  flex-direction: column;
+  height: 100svh;
+  overflow-y: auto;
+  scroll-snap-align: start;
+  scrollbar-width: none;
+  background: var(--light);
+  border-right: 1px solid var(--lightgray);
+  padding: 0 0.75rem 2rem;
+  box-sizing: border-box;
+
+  & .cs-nav a {
+    min-height: 44px;
+    align-items: center;
+  }
+  & .cs-nav summary {
+    min-height: 44px;
+  }
+}
+
+.cs-drawer-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0 0.5rem 0.6rem;
+  background: var(--light);
+  font-weight: 600;
+  color: var(--dark);
+}
+
+.cs-drawer-close {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--cs-radius-small);
+  background: transparent;
+  color: var(--dark);
+  cursor: pointer;
+  & svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+}
+
+@supports (animation-timeline: scroll()) {
+  @property --cs-drawer-backdrop {
+    syntax: "<number>";
+    inherits: true;
+    initial-value: 0;
+  }
+  @keyframes cs-drawer-backdrop {
+    0% {
+      --cs-drawer-backdrop: 1;
+    }
+    100% {
+      --cs-drawer-backdrop: 0;
+    }
+  }
+  .cs-drawer {
+    timeline-scope: --cs-drawer-fade;
+    animation: cs-drawer-backdrop linear both;
+    animation-timeline: --cs-drawer-fade;
+  }
+  .cs-drawer-scroller {
+    scroll-timeline: --cs-drawer-fade x;
+  }
+}
+
+// Phone header row: menu button, site title, then the search button, each a
+// 44px target.
+@media all and ($mobile) {
+  .page > #quartz-body .sidebar.left {
+    padding-top: 1rem;
+    gap: 0.25rem;
+  }
+  .page-title {
+    min-width: 0;
+    font-size: 1rem;
+    & a::before {
+      width: 1.8rem;
+      height: 1.8rem;
+    }
+  }
+  // Search shrinks to its icon.
+  .search > .search-button {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    justify-content: center;
+    & > p,
+    &::after {
+      display: none;
+    }
+  }
+}
+
+// ---------------------------------------------------------------- table of contents
+
+// Drawn by theme/components/TableOfContents.tsx: a heading and a list that is
+// never folded. The list is a box of its own, so that a long one does not push
+// the page's links and the graph out of the column; the script scrolls it to
+// keep the section you are reading in view.
+.toc {
+  & .toc-header {
+    margin: 0 0 0.6rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--gray);
+  }
+  & .toc-content {
+    list-style: none;
+    margin: 0;
+    padding: 0 0.5rem 0 0;
+    max-height: min(22rem, 42vh);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    font-size: 0.875rem;
+    & li {
+      margin: 0.35rem 0;
+      line-height: 1.35;
+      &:first-child {
+        margin-top: 0;
+      }
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+    @for $depth from 1 through 5 {
+      & .depth-#{$depth} {
+        padding-left: #{$depth}rem;
+      }
+    }
+    & a {
+      color: var(--darkgray);
+      font-weight: 400;
+      line-height: 1.35;
+      border-radius: 4px;
+      transition: color 0.15s var(--cs-ease);
+      &:hover {
+        color: var(--secondary);
+      }
+    }
+    // The section you are reading.
+    & a.current {
+      color: var(--secondary);
+      font-weight: 600;
+    }
+  }
+}
+
+// ---------------------------------------------------------------- code
+
+pre {
+  border-radius: var(--cs-radius);
+  border-color: var(--lightgray);
+}
+
+:not(pre) > code {
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+  font-size: 0.875em;
+}
+
+// ---------------------------------------------------------------- tables
+
+.table-container {
+  border: 1px solid var(--lightgray);
+  border-radius: var(--cs-radius);
+  margin: 1.5rem 0;
+  & > table {
+    margin: 0;
+    width: 100%;
+  }
+  & th {
+    background: color-mix(in srgb, var(--lightgray) 45%, transparent);
+  }
+  & th,
+  & td {
+    padding: 0.55rem 0.9rem;
+  }
+}
+
+// ---------------------------------------------------------------- callouts (Obsidian's look)
+
+.callout {
+  --cs-callout: var(--cs-blue);
+  --cs-callout-text: var(--cs-blue-text);
+  --color: var(--cs-callout-text);
+  border: 0;
+  border-radius: 4px;
+  background-color: rgba(var(--cs-callout), 0.1);
+  padding: 12px 12px 12px 24px;
+  margin: 1.25rem 0;
+
+  & > .callout-title {
+    padding: 0;
+    gap: 4px;
+    align-items: center;
+    & .callout-icon {
+      background-color: rgb(var(--cs-callout));
+      padding: 0;
+    }
+  }
+  & > .callout-content {
+    margin-top: 0.5rem;
+    & > :last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.callout[data-callout="abstract"],
+.callout[data-callout="summary"],
+.callout[data-callout="tldr"],
+.callout[data-callout="tip"],
+.callout[data-callout="hint"],
+.callout[data-callout="important"] {
+  --cs-callout: var(--cs-cyan);
+  --cs-callout-text: var(--cs-cyan-text);
+}
+.callout[data-callout="success"],
+.callout[data-callout="check"],
+.callout[data-callout="done"] {
+  --cs-callout: var(--cs-green);
+  --cs-callout-text: var(--cs-green-text);
+}
+.callout[data-callout="question"],
+.callout[data-callout="help"],
+.callout[data-callout="faq"],
+.callout[data-callout="warning"],
+.callout[data-callout="caution"],
+.callout[data-callout="attention"] {
+  --cs-callout: var(--cs-orange);
+  --cs-callout-text: var(--cs-orange-text);
+}
+.callout[data-callout="failure"],
+.callout[data-callout="fail"],
+.callout[data-callout="missing"],
+.callout[data-callout="danger"],
+.callout[data-callout="error"],
+.callout[data-callout="bug"] {
+  --cs-callout: var(--cs-red);
+  --cs-callout-text: var(--cs-red-text);
+}
+.callout[data-callout="example"] {
+  --cs-callout: var(--cs-purple);
+  --cs-callout-text: var(--cs-purple-text);
+}
+.callout[data-callout="quote"],
+.callout[data-callout="cite"] {
+  --cs-callout: var(--cs-gray);
+  --cs-callout-text: var(--cs-gray-text);
+}
+
+// A color word in the metadata paints that one callout, as Callout Studio does.
+@each $color in "red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink" {
+  .callout[data-callout-metadata~="#{$color}"] {
+    --cs-callout: var(--cs-#{$color});
+    --cs-callout-text: var(--cs-#{$color}-text);
+  }
+}
+
+// ---------------------------------------------------------------- live examples
+
+// Under a ```md preview fence: what the callouts above look like in a note.
+.cs-preview {
+  position: relative;
+  margin: -0.5rem 0 1.75rem;
+  padding: 1.75rem 1.25rem 1rem;
+  border: 1px solid var(--lightgray);
+  border-radius: var(--cs-radius);
+  background: var(--light);
+  &::before {
+    content: "Result";
+    position: absolute;
+    top: 0.5rem;
+    left: 1.25rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--gray);
+  }
+  & > :first-child,
+  & > .callout:first-child {
+    margin-top: 0.25rem;
+  }
+  & > :last-child {
+    margin-bottom: 0;
+  }
+  & > p {
+    margin: 0.5rem 0;
+  }
+}
+
+// The icon of a heading or inline callout, drawn from the same icon set.
+.cs-heading-callout,
+.cs-inline-callout {
+  & > .callout-icon {
+    flex: none;
+    width: 1em;
+    height: 1em;
+    background-color: rgb(var(--cs-callout));
+    mask: var(--callout-icon) no-repeat center / contain;
+  }
+  & > .callout-title-inner {
+    color: var(--cs-callout-text);
+  }
+}
+
+// A heading callout: the heading as a colored bar.
+.cs-heading-callout {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+  padding: 0.35rem 0.75rem;
+  font-family: var(--headerFont);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  &.cs-heading-1 {
+    font-size: 1.75rem;
+  }
+  &.cs-heading-2 {
+    font-size: 1.45rem;
+  }
+  &.cs-heading-3 {
+    font-size: 1.2rem;
+  }
+  &.cs-heading-4,
+  &.cs-heading-5,
+  &.cs-heading-6 {
+    font-size: 1rem;
+  }
+}
+
+// An inline callout: a small pill inside the sentence.
+.cs-inline-callout {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  margin: 0;
+  padding: 0.05em 0.55em;
+  border-radius: 999px;
+  font-size: 0.92em;
+  font-weight: 600;
+  line-height: 1.5;
+  vertical-align: baseline;
+  white-space: nowrap;
+}
+
+// ---------------------------------------------------------------- disclosure (FAQ, long reference parts)
+
+article details:not(.cs-nav-group) {
+  border: 1px solid var(--lightgray);
+  border-radius: var(--cs-radius);
+  margin: 0.75rem 0;
+  background: var(--cs-surface);
+  transition: border-color 0.15s var(--cs-ease);
+
+  & > summary {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.85rem 1rem;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--dark);
+    border-radius: var(--cs-radius);
+    &::-webkit-details-marker {
+      display: none;
+    }
+    &::before {
+      content: "";
+      flex: none;
+      width: 1rem;
+      height: 1rem;
+      background-color: var(--secondary);
+      mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>')
+        no-repeat center / contain;
+      rotate: -90deg;
+      transition: rotate 0.15s var(--cs-ease);
+    }
+    &:hover {
+      color: var(--secondary);
+    }
+  }
+  &[open] > summary::before {
+    rotate: 0deg;
+  }
+  &:hover {
+    border-color: color-mix(in srgb, var(--secondary) 35%, var(--lightgray));
+  }
+  & > :not(summary) {
+    margin-inline: 1rem;
+  }
+  & > :last-child:not(summary) {
+    margin-bottom: 1rem;
+  }
+}
+
+// ---------------------------------------------------------------- buttons
+
+.cs-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0 1.15rem;
+  border-radius: var(--cs-radius);
+  border: 1px solid var(--lightgray);
+  background: var(--cs-surface);
+  color: var(--dark);
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition:
+    background-color 0.15s var(--cs-ease),
+    border-color 0.15s var(--cs-ease),
+    box-shadow 0.15s var(--cs-ease);
+  & svg {
+    width: 1.05rem;
+    height: 1.05rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  &:hover {
+    border-color: color-mix(in srgb, var(--secondary) 45%, var(--lightgray));
+    box-shadow: var(--cs-shadow);
+  }
+}
+
+.cs-button-primary {
+  background: var(--secondary);
+  border-color: var(--secondary);
+  color: var(--cs-button-text);
+  &:hover {
+    background: var(--tertiary);
+    border-color: var(--tertiary);
+    color: var(--cs-button-text);
+  }
+}
+
+// ---------------------------------------------------------------- home page
+
+// A panel in the brand's purple: the label, the tagline, the buttons, and the
+// plugin's three callout forms rising from the panel's lower edge.
+.cs-hero {
+  --cs-hero-glow: rgb(119 80 184 / 0.2);
+  --cs-hero-top: #f2ebfd;
+  --cs-hero-accent: #7750b8;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.75rem;
+  margin: 0 0 2.5rem;
+  padding: 3rem 1.5rem 0;
+  border: 1px solid var(--lightgray);
+  border-radius: 20px;
+  text-align: center;
+  background:
+    radial-gradient(90% 60% at 50% 0%, var(--cs-hero-glow), transparent 70%),
+    linear-gradient(180deg, var(--cs-hero-top), var(--light) 80%);
+
+  :root[saved-theme="dark"] & {
+    --cs-hero-glow: rgb(150 110 240 / 0.3);
+    --cs-hero-top: #2a2040;
+    --cs-hero-accent: #b49cff;
+  }
+  @media all and ($mobile) {
+    margin-top: 1.25rem;
+    padding: 2.25rem 1rem 0;
+    gap: 1.5rem;
+  }
+}
+
+.cs-hero-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.1rem;
+  max-width: 34rem;
+}
+
+.cs-hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.35rem 0.9rem;
+  border: 1px solid var(--lightgray);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--cs-surface) 75%, transparent);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--secondary);
+  // The brush alone, in the label's colour (Lucide's, as the logo's).
+  & .cs-hero-brush {
+    flex: none;
+    width: 1.1rem;
+    height: 1.1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
+
+.cs-hero h1 {
+  margin: 0;
+  font-size: clamp(2.3rem, 6vw, 3.4rem);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+  color: var(--dark);
+}
+
+.cs-hero-accent {
+  color: var(--cs-hero-accent);
+}
+
+.cs-hero-lead {
+  margin: 0;
+  font-size: 1.15rem;
+  line-height: 1.6;
+  color: var(--darkgray);
+  text-wrap: pretty;
+}
+
+.cs-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+// The picture is cropped (theme/components/HomeHero.tsx) above the window's
+// own lower edge, so the panel's edge cuts the window off and it seems to
+// rise out of the panel.
+.cs-hero-picture {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.cs-hero-art {
+  width: 100%;
+  max-width: 34rem;
+  height: auto;
+}
+
+// The chapter tables, as cards (theme/chapterCards.ts).
+.cs-cards {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 0.75rem;
+
+  & > li {
+    margin: 0;
+    display: flex;
+  }
+}
+
+// On hover a card stays where it is: its border and title take the accent,
+// and its background a faint tint of it.
+a.cs-card {
+  flex: 1;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto 1fr;
+  column-gap: 0.6rem;
+  row-gap: 0.35rem;
+  padding: 1rem;
+  border: 1px solid var(--lightgray);
+  border-radius: var(--cs-radius);
+  background: var(--cs-surface);
+  color: var(--darkgray);
+  font-weight: 400;
+  text-decoration: none;
+  transition:
+    border-color 0.15s var(--cs-ease),
+    background-color 0.15s var(--cs-ease);
+
+  &:hover {
+    background: color-mix(in srgb, var(--secondary) 5%, var(--cs-surface));
+    border-color: color-mix(in srgb, var(--secondary) 55%, var(--lightgray));
+    color: var(--darkgray);
+    & .cs-card-title {
+      color: var(--secondary);
+    }
+  }
+  & .cs-card-number {
+    font: 600 0.75rem/1.6 var(--codeFont);
+    color: var(--secondary);
+    font-variant-numeric: tabular-nums;
+  }
+  & .cs-card-title {
+    font-weight: 600;
+    color: var(--dark);
+    line-height: 1.35;
+    transition: color 0.15s var(--cs-ease);
+  }
+  & .cs-card-text {
+    grid-column: 1 / -1;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--darkgray);
+    & code {
+      font-size: 0.85em;
+    }
+  }
+}
+
+// ---------------------------------------------------------------- end of page
+
+// After the page: the footer's own rule. Where the right-hand column is hidden,
+// the page's links come before it. Quartz's rule sits between the page and
+// everything that follows, which would put those links under it; it is hidden,
+// and the footer's rule is the only one.
+.page > #quartz-body .center > hr {
+  display: none;
+}
+
+// The right-hand column, on a wide screen: its sections (table of contents,
+// graph, the page's links) one under the other with a line between them. It
+// scrolls as a whole when they are taller than the screen.
+@media all and ($desktop) {
+  .page > #quartz-body .sidebar.right {
+    gap: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    & > * {
+      flex-shrink: 0;
+    }
+    & > * + * {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--lightgray);
+    }
+  }
+}
+
+// Where the column is hidden, Quartz puts what it holds (the graph) under the
+// article, after the page's links.
+@media all and not ($desktop) {
+  .page > #quartz-body .sidebar.right {
+    margin-top: 3rem;
+  }
+}
+
+// The graph, with a heading in the style of the table of contents'. Its box
+// keeps Quartz's height: the graph is drawn for a box at least 250px tall, and a
+// shorter one cuts it off.
+.sidebar.right .graph {
+  & > h3 {
+    margin: 0 0 0.6rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--gray);
+  }
+  & > .graph-outer {
+    margin: 0;
+    border-radius: var(--cs-radius-small);
+    background: var(--cs-surface);
+  }
+}
+
+// The page's links (theme/components/PageActions.tsx) are placed twice and one
+// is shown: on a wide screen they stand in the right-hand column, in groups;
+// where that column is hidden the two main ones stay under the article, above
+// the footer's rule.
+.cs-page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.875rem;
+
+  & a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--gray);
+    font-weight: 500;
+    background: none;
+    transition: color 0.15s var(--cs-ease);
+    &:hover {
+      color: var(--secondary);
+    }
+  }
+  & svg {
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
+
+.cs-page-actions-rail {
+  display: none;
+  @media all and ($desktop) {
+    display: flex;
+    flex-direction: column;
+    // The groups' lines: the first one, above the whole, is the column's.
+    & .cs-rail-group {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    & .cs-rail-group + .cs-rail-group {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--lightgray);
+    }
+    & h3 {
+      margin: 0 0 0.3rem;
+      font-size: 0.75rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--gray);
+    }
+    & a {
+      min-height: 2rem;
+    }
+  }
+}
+
+.cs-page-actions-end {
+  gap: 0 1.5rem;
+  margin: 1rem 0 0;
+  & a {
+    min-height: 44px;
+  }
+  @media all and ($desktop) {
+    display: none;
+  }
+}
+
+// ---------------------------------------------------------------- footer
+
+// One quiet row across the whole page (theme/components/SiteFooter.tsx): the
+// plugin's name, year and license on the left, the links and the light and dark
+// switch on the right. Quartz puts the footer in the article's column only;
+// here its grid row spans the left chapter list, the article and the right
+// column, and the row's edges line up with theirs (2rem in, like the sidebars'
+// own padding), so the rule is as wide as the page's content is.
+.page > #quartz-body {
+  @media all and ($desktop) {
+    grid-template-areas:
+      "grid-sidebar-left grid-header grid-sidebar-right"
+      "grid-sidebar-left grid-center grid-sidebar-right"
+      "grid-footer grid-footer grid-footer";
+  }
+  @media all and ($tablet) {
+    grid-template-areas:
+      "grid-sidebar-left grid-header"
+      "grid-sidebar-left grid-center"
+      "grid-sidebar-left grid-sidebar-right"
+      "grid-footer grid-footer";
+  }
+}
+
+// The sidebars stay in view for the length of the page (position: sticky), and
+// the browser lets them run to the bottom of the whole grid, footer row
+// included. A bottom margin, about the footer's height, stops them above it.
+.page > #quartz-body {
+  --cs-footer-room: 7.5rem;
+  @media all and not ($mobile) {
+    & .sidebar.left {
+      margin-bottom: var(--cs-footer-room);
+    }
+  }
+  @media all and ($desktop) {
+    & .sidebar.right {
+      margin-bottom: var(--cs-footer-room);
+    }
+  }
+}
+
+.page > #quartz-body > footer.cs-footer {
+  opacity: 1;
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: none;
+  width: auto;
+  margin: 2.5rem 0 0;
+  padding: 0.5rem 0 1rem;
+  border-top: 1px solid var(--lightgray);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0 2rem;
+  font-size: 0.8125rem;
+  color: var(--gray);
+
+  @media all and not ($mobile) {
+    margin-inline: 2rem;
+  }
+  // On a phone it is still one row: the name on the left, the links and the
+  // switch on the right. What does not fit below 640px (the license and the
+  // links marked hideOnPhone, class cs-footer-extra) is left out. At the
+  // narrowest widths, where even the rest does not fit, the links wrap under
+  // the name rather than run off the page.
+  @media all and ($mobile) {
+    margin-inline: 0;
+    padding-bottom: 1.25rem;
+    gap: 0 0.75rem;
+  }
+  @media all and (max-width: 640px) {
+    & .cs-footer-extra {
+      display: none;
+    }
+  }
+  @media all and (max-width: 345px) {
+    & .cs-footer-extra-xs {
+      display: none;
+    }
+  }
+
+  & .cs-footer-name {
+    margin: 0;
+    // Quartz colours every <p> darker than the links beside it.
+    color: var(--gray);
+    font-weight: 500;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0 0.4em;
+    // The license link looks like the links on the right: no underline, darker
+    // on hover.
+    & a {
+      min-height: 0;
+      text-decoration: none;
+    }
+  }
+  & ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0 1.75rem;
+    margin: 0;
+    margin-inline-start: auto;
+    padding: 0;
+    list-style: none;
+    @media all and ($mobile) {
+      flex-wrap: nowrap;
+      gap: 0 1rem;
+    }
+  }
+  & li {
+    margin: 0;
+  }
+  // The links, and the light and dark switch, which is a button but looks and
+  // behaves like the links: Quartz's own box for it (a 20px square with
+  // absolutely placed icons) is reset here.
+  & a,
+  & .cs-theme {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    width: auto;
+    height: auto;
+    min-height: 44px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    color: var(--gray);
+    font: inherit;
+    font-weight: 500;
+    background: none;
+    cursor: pointer;
+    transition: color 0.15s var(--cs-ease);
+    &:hover {
+      color: var(--darkgray);
+    }
+  }
+  & a svg,
+  & .cs-theme svg {
+    position: static;
+    flex: none;
+    width: 0.95rem;
+    height: 0.95rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  // The switch's icon stands alone, so it is a little larger than a link's.
+  // Its box is the touch target (44px high), only as wide as it needs to be:
+  // the icon sits flush with the row's end, in line with the words above it,
+  // not inset by the box around it.
+  & .cs-theme {
+    min-width: 2rem;
+    justify-content: center;
+    margin-inline-end: -0.4rem;
+    & svg {
+      width: 1.2rem;
+      height: 1.2rem;
+    }
+  }
+}
+
+// The switch is an icon that shows what a click does: a moon ("Dark mode") on
+// a light page, a sun ("Light mode") on a dark one. It keeps the 44px touch
+// target the links have (the box itself is sized in the footer's rule above).
+.cs-footer .cs-theme {
+  & .cs-to-dark,
+  & .cs-to-light {
+    display: inline-flex;
+    align-items: center;
+  }
+  &:focus-visible {
+    outline: 2px solid var(--secondary);
+    outline-offset: -4px;
+    border-radius: 6px;
+  }
+}
+.cs-footer .cs-theme .cs-to-light {
+  display: none;
+}
+:root[saved-theme="dark"] .cs-footer .cs-theme {
+  & .cs-to-dark {
+    display: none;
+  }
+  & .cs-to-light {
+    display: inline-flex;
+  }
+}
+// The words behind an icon: out of sight, but still read by a screen reader.
+.cs-footer .cs-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+// ---------------------------------------------------------------- 404 page
+
+// The page for an address that does not exist (theme/components/NotFound.tsx):
+// one panel in the home page's colours, centred on the screen, with the
+// footer at the bottom. Quartz draws this page in its "minimal" frame, which
+// has no sidebars.
+.page[data-frame="minimal"] > #quartz-body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  grid-template-rows: minmax(0, 1fr) auto;
+  // The page's own side padding (it leaves room for a right-hand column) and
+  // the article column's reading width do not apply here.
+  padding: 0;
+  & .center.minimal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 2.5rem 1rem 0;
+  }
+  // The page's own side padding is gone, and on a phone the footer relied on it.
+  @media all and ($mobile) {
+    & > footer.cs-footer {
+      margin-inline: 1rem;
+    }
+  }
+}
+
+.cs-404 {
+  --cs-hero-glow: rgb(119 80 184 / 0.2);
+  --cs-hero-top: #f2ebfd;
+  --cs-hero-accent: #7750b8;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(100%, 38rem);
+  margin: 0;
+  padding: 2.5rem 1.5rem 2.25rem;
+  border: 1px solid var(--lightgray);
+  border-radius: 20px;
+  text-align: center;
+  background:
+    radial-gradient(90% 60% at 50% 0%, var(--cs-hero-glow), transparent 70%),
+    linear-gradient(180deg, var(--cs-hero-top), var(--light) 80%);
+
+  :root[saved-theme="dark"] & {
+    --cs-hero-glow: rgb(150 110 240 / 0.3);
+    --cs-hero-top: #2a2040;
+    --cs-hero-accent: #b49cff;
+  }
+  @media all and ($mobile) {
+    padding: 2rem 1rem 1.75rem;
+  }
+
+  // "4", the plugin's brush as the zero, "4".
+  & .cs-404-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.04em;
+    margin: 0;
+    font-size: clamp(5rem, 24vw, 8.5rem);
+    // Weight 300: the 4's strokes are then as thick as the brush's line (1.5 of
+    // its 24 units at 1.05em, 0.066em), at every size.
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    color: var(--cs-hero-accent);
+  }
+  & .cs-404-brush {
+    flex: none;
+    // A square that cannot shrink or stretch: the picture keeps its shape at
+    // every width, only its size follows the number's.
+    width: 1.05em;
+    height: 1.05em;
+    aspect-ratio: 1;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  & .cs-404-eye {
+    fill: currentColor;
+    stroke: none;
+  }
+
+  & .cs-404-title {
+    margin: 1.25rem 0 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: var(--dark);
+  }
+  & .cs-404-lead {
+    max-width: 26rem;
+    margin: 0.6rem 0 0;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--darkgray);
+    text-wrap: pretty;
+  }
+  & .cs-404-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+  // A small link under the buttons, as quiet as the footer's.
+  & .cs-404-surprise {
+    margin: 1rem 0 0;
+    & a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      min-height: 44px;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--gray);
+      text-decoration: none;
+      transition: color 0.15s var(--cs-ease);
+      &:hover {
+        color: var(--secondary);
+      }
+    }
+    & svg {
+      flex: none;
+      width: 0.95rem;
+      height: 0.95rem;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+  }
+}

@@ -1,0 +1,130 @@
+name: Build and deploy a docs site
+
+# Called by the "Build and deploy" workflow of Callout-Studio/docs and
+# Callout-Studio/internal-docs, and run in that repository. It builds the site
+# from two commits written there:
+#   - source-commit.txt: the Callout-Studio/obsidian commit whose pages are
+#     published (Callout-Studio/obsidian rewrites it when its docs change);
+#   - theme-commit.txt: the commit of this repository whose theme and scripts
+#     build them (this repository's "Rebuild the sites" workflow rewrites it).
+# Only the checkouts below follow this file's main; everything that shapes the
+# site (theme/, the scripts, the Quartz version) comes from theme-commit.txt.
+
+on:
+  workflow_call:
+    inputs:
+      commit:
+        description: "Callout-Studio/obsidian commit to build: empty for the one in source-commit.txt"
+        type: string
+        required: false
+        default: ""
+      theme:
+        description: "Callout-Studio/docs-theme commit to build with: empty for the one in theme-commit.txt"
+        type: string
+        required: false
+        default: ""
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out the site
+        uses: actions/checkout@v7
+        with:
+          path: site
+
+      - name: Choose what to build
+        id: source
+        env:
+          REQUESTED_COMMIT: ${{ inputs.commit }}
+          REQUESTED_THEME: ${{ inputs.theme }}
+        run: |
+          commit="${REQUESTED_COMMIT:-$(tr -d '[:space:]' < site/source-commit.txt)}"
+          theme="$REQUESTED_THEME"
+          if [ -z "$theme" ] && [ -f site/theme-commit.txt ]; then
+            theme="$(tr -d '[:space:]' < site/theme-commit.txt)"
+          fi
+          echo "commit=$commit" >> "$GITHUB_OUTPUT"
+          echo "theme=${theme:-main}" >> "$GITHUB_OUTPUT"
+          echo "repository=$(jq -r .repository site/site.json)" >> "$GITHUB_OUTPUT"
+          {
+            echo "paths<<END_OF_PATHS"
+            jq -r '[.folder] + (.copy // []) | .[]' site/site.json
+            echo "END_OF_PATHS"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Check out the theme
+        uses: actions/checkout@v7
+        with:
+          repository: Callout-Studio/docs-theme
+          ref: ${{ steps.source.outputs.theme }}
+          path: docs-theme
+
+      - name: Choose the Quartz version
+        id: quartz
+        run: echo "version=$(tr -d '[:space:]' < docs-theme/quartz-version.txt)" >> "$GITHUB_OUTPUT"
+
+      # Only the docs folder is checked out. The full history (without file
+      # contents) is fetched so each page can show when it last changed.
+      - name: Check out the docs
+        uses: actions/checkout@v7
+        with:
+          repository: ${{ steps.source.outputs.repository }}
+          ref: ${{ steps.source.outputs.commit }}
+          path: source
+          fetch-depth: 0
+          sparse-checkout: ${{ steps.source.outputs.paths }}
+
+      - name: Check out Quartz
+        uses: actions/checkout@v7
+        with:
+          repository: jackyzha0/quartz
+          ref: ${{ steps.quartz.outputs.version }}
+          path: quartz
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: quartz/package-lock.json
+
+      # The theme and the site's own files go into Quartz, and the site's
+      # quartz.config.yaml is written (assemble.mjs), before Quartz installs the
+      # plugins that file lists.
+      - name: Install Quartz and put the site together
+        run: |
+          (cd quartz && npm ci)
+          node docs-theme/assemble.mjs site quartz
+          (cd quartz && npm run install-plugins)
+
+      # The graph plugin would load d3 and pixi.js from a CDN on every visit.
+      # They are fetched here, at pinned versions, and served from the site.
+      - name: Serve the graph's libraries from the site
+        run: node docs-theme/prepare-graph.mjs quartz
+
+      - name: Prepare the pages
+        run: node docs-theme/prepare-content.mjs site/site.json source quartz/content
+
+      - name: Build
+        working-directory: quartz
+        run: npx quartz build
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: quartz/public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish on GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
